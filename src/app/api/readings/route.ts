@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { nanoid } from "nanoid";
 import { createReadingSchema } from "@/lib/validation/reading";
-import { generateLocalInterpretation } from "@/lib/interpretation/local";
+import { interpretTarot } from "@/lib/ai/interpret";
 import { readingsRepo } from "@/server/repo/readings";
 import { ensureAnonId } from "@/server/identity";
 import { checkRateLimit } from "@/server/rate-limit";
@@ -35,8 +35,7 @@ export async function POST(request: NextRequest) {
   const input = parsed.data;
   const id = nanoid(14);
 
-  // 阶段4接入 AI Provider;当前使用本地解读引擎
-  const interpretation = generateLocalInterpretation(input);
+  const { interpretation } = await interpretTarot(input);
 
   await readingsRepo.create({
     id,
