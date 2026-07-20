@@ -51,8 +51,8 @@ export function SpreadsSection() {
                   {spread.cardCount} 张牌
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Clock3 className="h-3.5 w-3.5 text-[#d7b46a]" />
-                  约 {spread.estimatedMinutes} 分钟
+                  <Clock3 className="h-3.5 w-3.5 text-[#d7b46a]" />约{" "}
+                  {spread.estimatedMinutes} 分钟
                 </span>
                 <span className="ml-auto inline-flex items-center gap-1 text-[#d7b46a] transition-colors group-hover:text-[#f2da9c]">
                   试试

@@ -44,12 +44,7 @@ export type ReadingCategory =
   | "custom";
 
 export type ReadingStyle =
-  | "gentle"
-  | "rational"
-  | "poetic"
-  | "direct"
-  | "brief"
-  | "deep";
+  "gentle" | "rational" | "poetic" | "direct" | "brief" | "deep";
 
 export const READING_CATEGORIES: Record<
   ReadingCategory,

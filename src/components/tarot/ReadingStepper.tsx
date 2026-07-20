@@ -29,7 +29,10 @@ export function ReadingStepper({ current, onNavigate }: ReadingStepperProps) {
         const done = i < currentIndex;
         const active = i === currentIndex;
         return (
-          <li key={step.key} className="flex flex-1 items-center last:flex-none">
+          <li
+            key={step.key}
+            className="flex flex-1 items-center last:flex-none"
+          >
             <button
               type="button"
               disabled={!done || !onNavigate}

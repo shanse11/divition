@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Quote, Sun } from "lucide-react";
-import { TarotCardBack } from "@/components/tarot/TarotCardBack";
+import { ArrowRight, Quote } from "lucide-react";
+import { DailyPreview } from "./DailyPreview";
 import { zodiacSigns } from "@/data/zodiac";
 import { SectionHeading, SectionReveal } from "./SectionReveal";
 import {
@@ -12,19 +12,17 @@ import {
 
 const testimonials = [
   {
-    quote:
-      "抽牌那一刻真的很有仪式感,解读也不是模板话,像有人认真听完了我的问题。",
-    author: "匿名旅人 · 使用三张牌牌阵",
+    quote: "抽牌的仪式感让我愿意慢下来,把原本纠结的问题换一个角度重新看看。",
+    author: "匿名体验情境 · 三张牌牌阵",
+  },
+  {
+    quote: "每天留一分钟看一张牌,更像一种温柔的自我检查,而不是寻找确定答案。",
+    author: "匿名体验情境 · 每日一牌",
   },
   {
     quote:
-      "每天早上抽一张今日之牌已经成了习惯,连续打卡四十多天,像一种温柔的自我检查。",
-    author: "匿名旅人 · 每日一牌用户",
-  },
-  {
-    quote:
-      "解梦功能把我反复出现的梦拆解得很细,那些问题让我第一次认真想了想自己最近的状态。",
-    author: "匿名旅人 · AI 解梦用户",
+      "解梦中的提示问题让我重新整理最近的感受,也提醒我尊重梦境的个人含义。",
+    author: "匿名体验情境 · AI 解梦",
   },
 ] as const;
 
@@ -45,6 +43,22 @@ const faqs = [
     q: "AI 解读是如何生成的?",
     a: "AI 会综合你的问题、所选牌阵、每张牌的正逆位与牌位含义生成结构化解读。未配置 AI 服务时,会使用内置的本地解读引擎。",
   },
+  {
+    q: "同一天的每日一牌会改变吗?",
+    a: "不会。今日之牌会依据你的匿名访客标识或账号与日期稳定生成,当天刷新页面仍会看到同一张牌。",
+  },
+  {
+    q: "可以删除占卜记录和账号数据吗?",
+    a: "可以。你可以在记录页删除单条或多条记录；登录用户也可以在个人中心导出数据或申请删除账号。",
+  },
+  {
+    q: "占卜能替代专业建议吗?",
+    a: "不能。本站内容不构成医疗、心理、法律、投资或其他专业建议。遇到重要或紧急问题时,请寻求合格专业人士帮助。",
+  },
+  {
+    q: "为什么同一个问题可能得到不同解读?",
+    a: "抽到的牌、牌位、正逆位和你提供的语境都会影响解读。它们适合用来启发思考,不代表唯一答案或确定的未来。",
+  },
 ] as const;
 
 export function ClosingSection() {
@@ -53,29 +67,7 @@ export function ClosingSection() {
       {/* 今日之牌 + 星座入口 */}
       <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1.1fr_1fr]">
         <SectionReveal>
-          <div className="glass-card relative flex h-full flex-col justify-between overflow-hidden rounded-2xl p-8">
-            <div className="relative z-10 max-w-sm">
-              <p className="font-display text-[11px] tracking-[0.35em] text-[#d7b46a] uppercase">
-                Daily Card
-              </p>
-              <h3 className="font-serif-cn mt-3 text-2xl font-bold text-[#f7f1e7]">
-                今日之牌,正在等你翻开
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#b9b4c8]">
-                每天一张专属于你的牌。同一天里,无论刷新多少次,它都会安静地保持原样——就像一个只对你说一次的秘密。
-              </p>
-              <Link
-                href="/daily"
-                className="mt-6 inline-flex items-center gap-2 rounded-full border border-[rgba(215,180,106,0.4)] px-5 py-2.5 text-sm text-[#f2da9c] transition-colors hover:bg-[rgba(215,180,106,0.1)]"
-              >
-                <Sun className="h-4 w-4" />
-                抽取今日之牌
-              </Link>
-            </div>
-            <div className="absolute -right-6 -bottom-10 w-36 rotate-12 opacity-80 sm:w-44">
-              <TarotCardBack />
-            </div>
-          </div>
+          <DailyPreview />
         </SectionReveal>
 
         <SectionReveal delay={0.1}>
@@ -91,7 +83,7 @@ export function ClosingSection() {
                 <Link
                   key={sign.id}
                   href={`/zodiac?sign=${sign.id}`}
-                  className="group flex flex-col items-center gap-1 rounded-xl border border-transparent px-2 py-3 transition-all hover:border-[rgba(215,180,106,0.3)] hover:bg-[rgba(215,180,106,0.06)]"
+                  className="group flex min-h-11 flex-col items-center gap-1 rounded-xl border border-transparent px-2 py-3 transition-all hover:border-[rgba(215,180,106,0.3)] hover:bg-[rgba(215,180,106,0.06)] focus-visible:border-[rgba(215,180,106,0.5)] focus-visible:ring-2 focus-visible:ring-[#d7b46a] focus-visible:outline-none"
                   aria-label={`查看${sign.name}运势`}
                 >
                   <span className="text-xl text-[#d7b46a] transition-transform group-hover:scale-110">
@@ -112,8 +104,8 @@ export function ClosingSection() {
         <SectionReveal>
           <SectionHeading
             eyebrow="Voices"
-            title="来自旅人们的低语"
-            description="他们在这里遇见的,或许也是你正在寻找的。"
+            title="匿名体验情境"
+            description="以下为帮助理解产品体验的虚构示例,不是用户评价、效果承诺或真实性声明。"
           />
         </SectionReveal>
         <div className="mt-12 grid gap-5 md:grid-cols-3">

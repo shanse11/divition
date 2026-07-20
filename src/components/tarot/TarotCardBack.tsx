@@ -31,7 +31,14 @@ export function TarotCardBack({ className }: TarotCardBackProps) {
         fill="none"
       >
         {/* 中心月相 */}
-        <circle cx="60" cy="100" r="26" stroke="#d7b46a" strokeWidth="1" opacity="0.9" />
+        <circle
+          cx="60"
+          cy="100"
+          r="26"
+          stroke="#d7b46a"
+          strokeWidth="1"
+          opacity="0.9"
+        />
         <path
           d="M60 74a26 26 0 1 0 0 52 20 20 0 1 1 0-52Z"
           fill="#d7b46a"
@@ -68,10 +75,23 @@ export function TarotCardBack({ className }: TarotCardBackProps) {
         ))}
         {/* 细点星尘 */}
         {[
-          [38, 62], [82, 62], [38, 138], [82, 138],
-          [60, 22], [60, 178], [30, 100], [90, 100],
+          [38, 62],
+          [82, 62],
+          [38, 138],
+          [82, 138],
+          [60, 22],
+          [60, 178],
+          [30, 100],
+          [90, 100],
         ].map(([x, y], i) => (
-          <circle key={`d${i}`} cx={x} cy={y} r="0.9" fill="#f2da9c" opacity="0.7" />
+          <circle
+            key={`d${i}`}
+            cx={x}
+            cy={y}
+            r="0.9"
+            fill="#f2da9c"
+            opacity="0.7"
+          />
         ))}
       </svg>
     </div>

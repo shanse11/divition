@@ -21,7 +21,8 @@ const examplesByCategory: Partial<Record<ReadingCategory, string[]>> = {
 };
 
 /** 过于模糊的问题模式 */
-const VAGUE_PATTERNS = /^(怎么办|如何|为什么|好吗|行吗|嗯+|啊+|测一下|算一下|随便|不知道)[??。.!!]*$/;
+const VAGUE_PATTERNS =
+  /^(怎么办|如何|为什么|好吗|行吗|嗯+|啊+|测一下|算一下|随便|不知道)[??。.!!]*$/;
 
 interface QuestionStepProps {
   category: ReadingCategory;

@@ -52,7 +52,9 @@ export function generateLocalInterpretation(
       ? card.reversedKeywords
       : card.uprightKeywords;
     const orientation = drawn.reversed ? "逆位" : "正位";
-    const posMeaning = position ? `在「${position.name}」的位置上(${position.meaning}),` : "";
+    const posMeaning = position
+      ? `在「${position.name}」的位置上(${position.meaning}),`
+      : "";
     return {
       positionIndex: drawn.positionIndex,
       positionName: position?.name ?? `第 ${drawn.positionIndex + 1} 张`,
@@ -114,7 +116,8 @@ export function generateLocalInterpretation(
         : "能量顺畅时,把想了很久的事排进本周的日程。",
       "无论牌面如何,最终的选择权始终在你手中。",
     ],
-    signs: "接下来的一到两周,留意与牌面关键词呼应的人、对话或机会——它们往往是提醒你回到这次思考的信号。",
+    signs:
+      "接下来的一到两周,留意与牌面关键词呼应的人、对话或机会——它们往往是提醒你回到这次思考的信号。",
     summary: firstCard
       ? `记住「${firstCard.name}」带来的讯息:${firstCard.essence}。`
       : "答案不在牌里,而在你看牌时心里浮现的那个念头。",

@@ -13,7 +13,11 @@ import { DrawStep } from "@/components/tarot/steps/DrawStep";
 import { LoadingOracle } from "@/components/feedback/LoadingOracle";
 import { useReadingFlow } from "@/stores/reading-flow";
 import { getSpreadById } from "@/data/spreads";
-import { READING_CATEGORIES, type DrawnCard, type ReadingCategory } from "@/types/tarot";
+import {
+  READING_CATEGORIES,
+  type DrawnCard,
+  type ReadingCategory,
+} from "@/types/tarot";
 
 export function ReadingFlow() {
   const router = useRouter();

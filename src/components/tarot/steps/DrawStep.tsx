@@ -11,8 +11,10 @@ import { getCardById } from "@/data/tarot-cards";
 import type { TarotSpread } from "@/data/spreads";
 import type { DrawnCard } from "@/types/tarot";
 import { cn } from "@/lib/utils";
+import { playSound } from "@/components/audio/MusicController";
 
-type DrawPhase = "ready" | "shuffling" | "cutting" | "picking" | "revealing" | "done";
+type DrawPhase =
+  "ready" | "shuffling" | "cutting" | "picking" | "revealing" | "done";
 
 const PICK_POOL_SIZE = 22;
 
@@ -37,8 +39,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
   const [pickedCount, setPickedCount] = useState(0);
   const [pickedPool, setPickedPool] = useState<Set<number>>(new Set());
   const [revealed, setRevealed] = useState(0);
-  // 抽牌结果在进入 picking 阶段时预先生成,点击只是揭示顺序
-  const drawnRef = useRef<DrawnCard[]>([]);
+  const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
@@ -51,12 +52,17 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
   }, []);
 
   const startShuffle = useCallback(() => {
+    playSound("shuffle");
     setPhase("shuffling");
-    drawnRef.current = drawCards(spread.cardCount);
+    setDrawnCards(drawCards(spread.cardCount));
+    setPickedPool(new Set());
+    setPickedCount(0);
+    setRevealed(0);
     schedule(() => setPhase("cutting"), reduceMotion ? 300 : 2400);
   }, [spread.cardCount, schedule, reduceMotion]);
 
   const handleCut = useCallback(() => {
+    playSound("button");
     setPhase("picking");
   }, []);
 
@@ -64,6 +70,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
     (poolIndex: number) => {
       if (pickedPool.has(poolIndex)) return;
       if (pickedCount >= spread.cardCount) return;
+      playSound("pick");
       const next = pickedCount + 1;
       setPickedPool((prev) => new Set(prev).add(poolIndex));
       setPickedCount(next);
@@ -83,7 +90,13 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
       schedule(() => setPhase("done"), 500);
       return;
     }
-    schedule(() => setRevealed((r) => r + 1), reduceMotion ? 120 : 650);
+    schedule(
+      () => {
+        playSound("flip");
+        setRevealed((r) => r + 1);
+      },
+      reduceMotion ? 120 : 650,
+    );
   }, [phase, revealed, spread.cardCount, schedule, reduceMotion]);
 
   const fanIndices = useMemo(
@@ -149,9 +162,21 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
                   reduceMotion
                     ? {}
                     : {
-                        x: [0, (i % 2 ? 1 : -1) * (60 + i * 12), 0, (i % 2 ? -1 : 1) * 40, 0],
+                        x: [
+                          0,
+                          (i % 2 ? 1 : -1) * (60 + i * 12),
+                          0,
+                          (i % 2 ? -1 : 1) * 40,
+                          0,
+                        ],
                         y: [0, -20 + (i % 3) * 14, 8, -12, 0],
-                        rotate: [0, (i % 2 ? 1 : -1) * (10 + i * 3), 0, (i % 2 ? -1 : 1) * 8, 0],
+                        rotate: [
+                          0,
+                          (i % 2 ? 1 : -1) * (10 + i * 3),
+                          0,
+                          (i % 2 ? -1 : 1) * 8,
+                          0,
+                        ],
                       }
                 }
                 transition={{
@@ -197,7 +222,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
         {/* 选牌:扇形排列 */}
         {phase === "picking" && (
           <div className="mx-auto max-w-3xl">
-            <div className="scrollbar-none flex justify-start gap-0 overflow-x-auto px-6 py-10 sm:justify-center">
+            <div className="flex scrollbar-none justify-start gap-0 overflow-x-auto px-6 py-10 sm:justify-center">
               {fanIndices.map((i) => {
                 const picked = pickedPool.has(i);
                 const mid = (PICK_POOL_SIZE - 1) / 2;
@@ -214,12 +239,18 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
                       y: picked ? -60 : 0,
                       scale: picked ? 0.6 : 1,
                     }}
-                    transition={{ duration: 0.45, delay: picked ? 0 : i * 0.025 }}
+                    transition={{
+                      duration: 0.45,
+                      delay: picked ? 0 : i * 0.025,
+                    }}
                     whileHover={
                       picked || reduceMotion ? {} : { y: -18, zIndex: 40 }
                     }
-                    className="w-14 shrink-0 -ml-6 first:ml-0 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-[#d7b46a] focus-visible:outline-none sm:w-16 sm:-ml-7"
-                    style={{ rotate: `${angle}deg`, transformOrigin: "bottom center" }}
+                    className="-ml-6 w-14 shrink-0 cursor-pointer rounded-lg first:ml-0 focus-visible:ring-2 focus-visible:ring-[#d7b46a] focus-visible:outline-none sm:-ml-7 sm:w-16"
+                    style={{
+                      rotate: `${angle}deg`,
+                      transformOrigin: "bottom center",
+                    }}
                     aria-label={`抽取第${i + 1}张牌`}
                   >
                     <TarotCardBack />
@@ -239,7 +270,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
             )}
           >
             {spread.positions.map((pos) => {
-              const drawn = drawnRef.current.find(
+              const drawn = drawnCards.find(
                 (d) => d.positionIndex === pos.index,
               );
               const card = drawn ? getCardById(drawn.cardId) : undefined;
@@ -270,7 +301,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
                         <TarotCardBack />
                       </div>
                       <div
-                        className="backface-hidden absolute inset-0"
+                        className="absolute inset-0 backface-hidden"
                         style={{ transform: "rotateY(180deg)" }}
                       >
                         {card && (
@@ -318,7 +349,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
             >
               <Button
                 size="lg"
-                onClick={() => onComplete(drawnRef.current)}
+                onClick={() => onComplete(drawnCards)}
                 className="btn-gold-shimmer h-12 bg-[#d7b46a] px-8 text-base text-[#1c1608] hover:bg-[#f2da9c]"
               >
                 <Sparkles className="h-5 w-5" />
@@ -329,8 +360,7 @@ export function DrawStep({ spread, onComplete, onBack }: DrawStepProps) {
         </AnimatePresence>
         {phase !== "done" && phase !== "ready" && (
           <span className="flex items-center gap-1.5 text-xs text-[#b9b4c8]/60">
-            <Layers className="h-3.5 w-3.5" />
-            共 {spread.cardCount} 张
+            <Layers className="h-3.5 w-3.5" />共 {spread.cardCount} 张
           </span>
         )}
       </div>

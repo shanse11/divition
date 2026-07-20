@@ -69,11 +69,25 @@ export function Footer() {
             </nav>
           ))}
         </div>
-        <div className="mt-12 flex flex-col items-center gap-3 border-t border-[rgba(215,180,106,0.08)] pt-6 text-center">
-          <p className="text-xs text-[#b9b4c8]/70">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[rgba(215,180,106,0.08)] pt-6 text-center sm:flex-row sm:text-left">
+          <p className="text-xs leading-relaxed text-[#b9b4c8]/70">
             © {new Date().getFullYear()} {siteConfig.name} {siteConfig.nameEn}
             。占卜内容由 AI 生成,仅供娱乐,请勿作为医疗、法律或投资依据。
           </p>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs sm:justify-end">
+            <Link
+              className="min-h-11 py-3 text-[#b9b4c8] transition-colors hover:text-[#f7f1e7] focus-visible:ring-2 focus-visible:ring-[#d7b46a] focus-visible:outline-none"
+              href="/about#privacy"
+            >
+              隐私说明
+            </Link>
+            <Link
+              className="min-h-11 py-3 text-[#b9b4c8] transition-colors hover:text-[#f7f1e7] focus-visible:ring-2 focus-visible:ring-[#d7b46a] focus-visible:outline-none"
+              href="/about#disclaimer"
+            >
+              娱乐免责声明
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

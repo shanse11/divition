@@ -2,7 +2,8 @@
  * 轻量结构化日志。
  * 自动脱敏:不输出 apiKey、authorization、question 等敏感字段。
  */
-const SENSITIVE_KEYS = /key|token|authorization|password|secret|question|content/i;
+const SENSITIVE_KEYS =
+  /key|token|authorization|password|secret|question|content/i;
 
 type LogData = Record<string, unknown>;
 
@@ -18,7 +19,11 @@ function sanitize(data: LogData): LogData {
   return out;
 }
 
-function log(level: "info" | "warn" | "error", event: string, data: LogData = {}) {
+function log(
+  level: "info" | "warn" | "error",
+  event: string,
+  data: LogData = {},
+) {
   const line = JSON.stringify({
     level,
     event,

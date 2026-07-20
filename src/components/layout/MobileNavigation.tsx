@@ -40,7 +40,10 @@ export function MobileNavigation() {
               aria-current={active ? "page" : undefined}
             >
               <Icon
-                className={cn("h-5 w-5", active && "drop-shadow-[0_0_6px_rgba(242,218,156,0.6)]")}
+                className={cn(
+                  "h-5 w-5",
+                  active && "drop-shadow-[0_0_6px_rgba(242,218,156,0.6)]",
+                )}
               />
               {item.title}
             </Link>

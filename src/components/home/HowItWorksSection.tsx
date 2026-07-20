@@ -6,8 +6,7 @@ const steps = [
     icon: HelpCircle,
     step: "壹",
     title: "静心并提出问题",
-    description:
-      "深呼吸,让思绪沉淀。把心里盘旋的疑问,凝练成一句真诚的话。",
+    description: "深呼吸,让思绪沉淀。把心里盘旋的疑问,凝练成一句真诚的话。",
   },
   {
     icon: LayoutGrid,
@@ -20,15 +19,13 @@ const steps = [
     icon: Hand,
     step: "叁",
     title: "洗牌并抽牌",
-    description:
-      "卡牌在指尖流转,凭直觉停下。你抽到的每一张牌,都不是偶然。",
+    description: "卡牌在指尖流转,凭直觉停下。你抽到的每一张牌,都不是偶然。",
   },
   {
     icon: BrainCircuit,
     step: "肆",
     title: "获得 AI 深度解读",
-    description:
-      "AI 结合牌面、正逆位与牌位关系,为你展开一份结构完整的指引。",
+    description: "AI 结合牌面、正逆位与牌位关系,为你展开一份结构完整的指引。",
   },
 ] as const;
 

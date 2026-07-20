@@ -88,7 +88,7 @@ export function ReadingResult({ reading }: ReadingResultProps) {
       </header>
 
       {/* 牌面横排展示 */}
-      <div className="scrollbar-none -mx-4 flex gap-4 overflow-x-auto px-4 py-4 sm:justify-center">
+      <div className="-mx-4 flex scrollbar-none gap-4 overflow-x-auto px-4 py-4 sm:justify-center">
         {reading.cards.map((drawn) => {
           const card = getCardById(drawn.cardId);
           const position = spread?.positions.find(
@@ -96,10 +96,7 @@ export function ReadingResult({ reading }: ReadingResultProps) {
           );
           if (!card) return null;
           return (
-            <figure
-              key={drawn.positionIndex}
-              className="w-24 shrink-0 sm:w-28"
-            >
+            <figure key={drawn.positionIndex} className="w-24 shrink-0 sm:w-28">
               <TarotCardFace
                 name={card.name}
                 nameEn={card.nameEn}

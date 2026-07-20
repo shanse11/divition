@@ -15,7 +15,12 @@ interface SpreadStepProps {
   onBack: () => void;
 }
 
-export function SpreadStep({ value, onSelect, onNext, onBack }: SpreadStepProps) {
+export function SpreadStep({
+  value,
+  onSelect,
+  onNext,
+  onBack,
+}: SpreadStepProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -71,8 +76,8 @@ export function SpreadStep({ value, onSelect, onNext, onBack }: SpreadStepProps)
                 {spread.cardCount} 张
               </span>
               <span className="inline-flex items-center gap-1">
-                <Clock3 className="h-3 w-3 text-[#d7b46a]" />
-                约 {spread.estimatedMinutes} 分钟
+                <Clock3 className="h-3 w-3 text-[#d7b46a]" />约{" "}
+                {spread.estimatedMinutes} 分钟
               </span>
             </div>
           </button>

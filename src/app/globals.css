@@ -142,7 +142,13 @@
 
   /* 金色渐变文字 */
   .text-gold-gradient {
-    background: linear-gradient(120deg, #b3904e 0%, #f2da9c 45%, #d7b46a 70%, #f7ecd2 100%);
+    background: linear-gradient(
+      120deg,
+      #b3904e 0%,
+      #f2da9c 45%,
+      #d7b46a 70%,
+      #f7ecd2 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

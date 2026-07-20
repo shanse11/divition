@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { PreferenceApplicator } from "@/components/preferences/PreferenceApplicator";
+import { MusicController } from "@/components/audio/MusicController";
+import { getCurrentUser } from "@/server/auth";
+import { prisma } from "@/server/db";
 import "./globals.css";
 
 const notoSans = Noto_Sans_SC({
@@ -57,17 +61,39 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+  const settings = user
+    ? await prisma.userSettings.findUnique({
+        where: { userId: user.id },
+        select: {
+          motionLevel: true,
+          musicEnabled: true,
+          musicVolume: true,
+        },
+      })
+    : null;
+  const preferences = settings as {
+    motionLevel: "full" | "reduced";
+    musicEnabled: boolean;
+    musicVolume: number;
+  } | null;
   return (
     <html
       lang="zh-CN"
       className={`${notoSans.variable} ${notoSerif.variable} ${cinzel.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <PreferenceApplicator preferences={preferences} />
+        <MusicController
+          initialEnabled={preferences?.musicEnabled ?? false}
+          initialVolume={(preferences?.musicVolume ?? 50) / 100}
+          initialReducedEffects={preferences?.motionLevel === "reduced"}
+        />
         {children}
         <Toaster position="top-center" richColors />
       </body>

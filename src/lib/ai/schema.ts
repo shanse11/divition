@@ -28,7 +28,9 @@ export const interpretationSchema = z.object({
 export const dreamInterpretationSchema = z.object({
   theme: z.string().min(1).max(200),
   keyImages: z
-    .array(z.object({ image: z.string().max(50), meaning: z.string().max(500) }))
+    .array(
+      z.object({ image: z.string().max(50), meaning: z.string().max(500) }),
+    )
     .min(1)
     .max(8),
   psychologicalMapping: z.string().min(1).max(2000),

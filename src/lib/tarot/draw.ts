@@ -34,7 +34,10 @@ export interface DrawOptions {
 /**
  * 从 78 张牌中安全抽取 count 张,不重复,每张独立判定正逆位。
  */
-export function drawCards(count: number, options: DrawOptions = {}): DrawnCard[] {
+export function drawCards(
+  count: number,
+  options: DrawOptions = {},
+): DrawnCard[] {
   if (count < 1 || count > tarotDeck.length) {
     throw new Error(`抽牌数量必须在 1-${tarotDeck.length} 之间`);
   }

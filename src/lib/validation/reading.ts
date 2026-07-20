@@ -58,7 +58,15 @@ export const createReadingSchema = z
 
 export type CreateReadingInput = z.infer<typeof createReadingSchema>;
 
-export const updateReadingSchema = z.object({
-  favorite: z.boolean().optional(),
-  note: z.string().trim().max(2000).optional(),
-});
+export const updateReadingSchema = z
+  .object({
+    favorite: z.boolean().optional(),
+    note: z.string().trim().max(2000).optional(),
+  })
+  .strict()
+  .refine(
+    ({ favorite, note }) => favorite !== undefined || note !== undefined,
+    {
+      message: "至少提供一个要更新的字段",
+    },
+  );

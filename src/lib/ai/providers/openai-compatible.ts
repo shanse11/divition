@@ -89,8 +89,6 @@ export class OpenAiCompatibleProvider implements AiProvider {
         clearTimeout(timer);
       }
     }
-    throw lastError instanceof Error
-      ? lastError
-      : new Error("AI 请求失败");
+    throw lastError instanceof Error ? lastError : new Error("AI 请求失败");
   }
 }

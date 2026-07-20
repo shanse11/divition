@@ -2,6 +2,13 @@
 
 import { useMemo } from "react";
 
+function seededRandom(index: number): number {
+  let value = 20260719 + index * 2654435761;
+  value = Math.imul(value ^ (value >>> 16), 2246822507);
+  value = Math.imul(value ^ (value >>> 13), 3266489909);
+  return ((value ^ (value >>> 16)) >>> 0) / 4294967296;
+}
+
 interface Star {
   x: number;
   y: number;
@@ -19,22 +26,18 @@ interface StarFieldProps {
 
 /** 基于确定性伪随机的静态星点层,CSS 动画闪烁,不引起重排 */
 export function StarField({ count = 90, className }: StarFieldProps) {
-  const stars = useMemo<Star[]>(() => {
-    // 固定种子的 LCG,保证 SSR 与客户端渲染一致
-    let seed = 20260719;
-    const rand = () => {
-      seed = (seed * 1664525 + 1013904223) % 4294967296;
-      return seed / 4294967296;
-    };
-    return Array.from({ length: count }, () => ({
-      x: rand() * 100,
-      y: rand() * 100,
-      size: 0.8 + rand() * 1.6,
-      delay: rand() * 6,
-      duration: 3 + rand() * 5,
-      opacity: 0.3 + rand() * 0.7,
-    }));
-  }, [count]);
+  const stars = useMemo<Star[]>(
+    () =>
+      Array.from({ length: count }, (_, index) => ({
+        x: seededRandom(index * 6) * 100,
+        y: seededRandom(index * 6 + 1) * 100,
+        size: 0.8 + seededRandom(index * 6 + 2) * 1.6,
+        delay: seededRandom(index * 6 + 3) * 6,
+        duration: 3 + seededRandom(index * 6 + 4) * 5,
+        opacity: 0.3 + seededRandom(index * 6 + 5) * 0.7,
+      })),
+    [count],
+  );
 
   return (
     <div

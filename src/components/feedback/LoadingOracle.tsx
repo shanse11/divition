@@ -46,7 +46,9 @@ export function LoadingOracle() {
         {/* 中心星 */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center text-2xl text-[#f2da9c]"
-          animate={reduceMotion ? {} : { scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+          animate={
+            reduceMotion ? {} : { scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }
+          }
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           aria-hidden
         >

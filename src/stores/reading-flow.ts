@@ -1,18 +1,9 @@
 "use client";
 
 import { create } from "zustand";
-import type {
-  DrawnCard,
-  ReadingCategory,
-  ReadingStyle,
-} from "@/types/tarot";
+import type { DrawnCard, ReadingCategory, ReadingStyle } from "@/types/tarot";
 
-export type ReadingStep =
-  | "category"
-  | "question"
-  | "spread"
-  | "style"
-  | "draw";
+export type ReadingStep = "category" | "question" | "spread" | "style" | "draw";
 
 interface ReadingFlowState {
   step: ReadingStep;

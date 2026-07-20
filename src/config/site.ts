@@ -13,9 +13,17 @@ export interface NavItem {
 }
 
 export const mainNav: NavItem[] = [
-  { title: "塔罗占卜", href: "/tarot", description: "洗牌、抽牌与 AI 深度解读" },
+  {
+    title: "塔罗占卜",
+    href: "/tarot",
+    description: "洗牌、抽牌与 AI 深度解读",
+  },
   { title: "每日一牌", href: "/daily", description: "今日之牌与运势提醒" },
-  { title: "星座", href: "/zodiac", description: "十二星座今日、本周与本月运势" },
+  {
+    title: "星座",
+    href: "/zodiac",
+    description: "十二星座今日、本周与本月运势",
+  },
   { title: "解梦", href: "/dream", description: "记录梦境,倾听潜意识的低语" },
   { title: "关系", href: "/relationship", description: "感情与关系的多维洞察" },
   { title: "记录", href: "/history", description: "回顾走过的每一次占卜" },

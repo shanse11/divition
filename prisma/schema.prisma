@@ -1,0 +1,215 @@
+// 星语秘境 Prisma Schema
+// SQLite 本地开发;切换 PostgreSQL 时仅需改 datasource provider 与 DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  nickname     String
+  avatarSeed   String    @default("star")
+  bio          String    @default("")
+  birthDate    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  readings         TarotReading[]
+  dailyReadings    DailyReading[]
+  dreamReadings    DreamReading[]
+  favorites        Favorite[]
+  settings         UserSettings?
+  achievements     UserAchievement[]
+
+  @@index([email])
+}
+
+// 预留 OAuth 账号关联(当前仅邮箱登录)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model TarotReading {
+  id        String   @id
+  // 登录用户 ID 或匿名 anon_ 前缀 ID
+  ownerId   String
+  userId    String?
+  kind      String   @default("tarot") // tarot | relationship
+  category  String
+  question  String   @default("")
+  spreadId  String
+  style     String
+  // JSON: Interpretation
+  interpretation String?
+  favorite  Boolean  @default(false)
+  note      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  draws     TarotDraw[]
+  shares    ShareLink[]
+  notes     ReadingNote[]
+  favorites Favorite[] @relation("ReadingFavorites")
+
+  @@index([ownerId, createdAt])
+  @@index([userId])
+}
+
+model TarotDraw {
+  id            String  @id @default(cuid())
+  readingId     String
+  cardId        String
+  reversed      Boolean
+  positionIndex Int
+  reading       TarotReading @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@unique([readingId, positionIndex])
+  @@index([readingId])
+}
+
+model ReadingNote {
+  id        String   @id @default(cuid())
+  readingId String   @unique
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reading   TarotReading @relation(fields: [readingId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  // 登录用户 ID 或匿名 anon_ 前缀 ID；所有收藏均有稳定归属。
+  ownerId   String
+  userId    String?
+  readingId String?
+  // 收藏目标:reading | daily | dream
+  targetType String
+  targetId   String
+  createdAt DateTime @default(now())
+  user      User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reading   TarotReading? @relation("ReadingFavorites", fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, targetType, targetId])
+  @@index([userId])
+  @@index([readingId])
+  @@index([ownerId, targetType])
+}
+
+model DailyReading {
+  id        String   @id @default(cuid())
+  // 登录用户 ID 或匿名 ID
+  ownerId   String
+  userId    String?
+  // YYYY-MM-DD
+  date      String
+  cardId    String
+  reversed  Boolean
+  // JSON: DailyFortune
+  content   String
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 每人每天唯一
+  @@unique([ownerId, date])
+  @@index([userId])
+}
+
+model DreamReading {
+  id        String   @id @default(cuid())
+  ownerId   String
+  userId    String?
+  // 脱敏后的梦境输入 JSON
+  input     String
+  // JSON: DreamInterpretation
+  result    String
+  title     String   @default("")
+  note      String   @default("")
+  favorite  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt])
+  @@index([userId])
+}
+
+model UserSettings {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  defaultStyle   String  @default("gentle")
+  motionLevel    String  @default("full") // full | reduced
+  musicEnabled   Boolean @default(false)
+  musicVolume    Int     @default(50)
+  // 分享时默认是否显示问题
+  shareShowQuestion Boolean @default(false)
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ShareLink {
+  id        String   @id // 不可预测的公开 ID
+  readingId String
+  // 是否在分享中显示问题
+  showQuestion Boolean @default(false)
+  createdAt DateTime @default(now())
+  reading   TarotReading @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@index([readingId])
+}
+
+model Achievement {
+  id          String @id
+  name        String
+  description String
+  icon        String
+  // streak 天数门槛等条件参数
+  threshold   Int
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}

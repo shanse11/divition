@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  CloudMoon,
-  MoonStar,
-  Sparkles,
-  Sun,
-} from "lucide-react";
+import { ArrowRight, CloudMoon, MoonStar, Sparkles, Sun } from "lucide-react";
 import { SectionHeading, SectionReveal } from "./SectionReveal";
 
 const services = [
@@ -28,8 +22,7 @@ const services = [
   {
     icon: MoonStar,
     title: "星座解读",
-    description:
-      "十二星座的今日、本周与本月运势。感情、事业、财运,一目了然。",
+    description: "十二星座的今日、本周与本月运势。感情、事业、财运,一目了然。",
     href: "/zodiac",
     cta: "查看星座运势",
   },

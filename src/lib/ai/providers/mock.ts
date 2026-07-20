@@ -10,7 +10,8 @@ import type { AiMessage, AiProvider } from "@/lib/ai/provider";
 export class MockProvider implements AiProvider {
   readonly name = "mock";
 
-  async complete(_messages: AiMessage[]): Promise<string> {
+  async complete(messages: AiMessage[]): Promise<string> {
+    void messages;
     // 模拟少量延迟,让加载动画自然呈现
     await new Promise((resolve) => setTimeout(resolve, 400));
     return JSON.stringify({ __mock: true });

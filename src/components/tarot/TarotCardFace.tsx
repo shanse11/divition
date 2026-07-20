@@ -114,10 +114,24 @@ export function TarotCardFace({
           />
         ))}
         {sparks.map((s, i) => (
-          <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="#f2da9c" opacity="0.75" />
+          <circle
+            key={i}
+            cx={s.x}
+            cy={s.y}
+            r={s.r}
+            fill="#f2da9c"
+            opacity="0.75"
+          />
         ))}
         <circle cx="60" cy="92" r="4" fill={hue} opacity="0.9" />
-        <circle cx="60" cy="92" r="8.5" stroke={hue} strokeWidth="0.6" opacity="0.5" />
+        <circle
+          cx="60"
+          cy="92"
+          r="8.5"
+          stroke={hue}
+          strokeWidth="0.6"
+          opacity="0.5"
+        />
       </svg>
       {/* 花色符号 */}
       <div

@@ -1,8 +1,4 @@
-import type {
-  DrawnCard,
-  ReadingCategory,
-  ReadingStyle,
-} from "@/types/tarot";
+import type { DrawnCard, ReadingCategory, ReadingStyle } from "@/types/tarot";
 
 /** AI 结构化解读结果 */
 export interface Interpretation {

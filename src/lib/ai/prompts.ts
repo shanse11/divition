@@ -39,7 +39,9 @@ export function buildTarotUserPrompt(input: TarotPromptInput): string {
   const cardLines = input.cards
     .map((drawn) => {
       const card = getCardById(drawn.cardId);
-      const pos = spread?.positions.find((p) => p.index === drawn.positionIndex);
+      const pos = spread?.positions.find(
+        (p) => p.index === drawn.positionIndex,
+      );
       if (!card) return "";
       const keywords = drawn.reversed
         ? card.reversedKeywords
