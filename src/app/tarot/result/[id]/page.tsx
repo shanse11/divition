@@ -68,6 +68,7 @@ export default async function ReadingResultPage({ params }: PageProps) {
           nameEn: card.nameEn,
           label: card.label,
           suit: card.suit,
+          image: card.image,
           seed: card.index + 1,
           position:
             item?.positionName ??

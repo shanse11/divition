@@ -64,6 +64,7 @@ export default async function SharePage({
                     label={card.label}
                     seed={card.index + 1}
                     suit={card.suit}
+                    image={card.image}
                     reversed={draw.reversed}
                     className="text-[9px]"
                   />

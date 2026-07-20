@@ -11,6 +11,8 @@ import {
   ScrollText,
   Sparkles,
   Telescope,
+  ExternalLink,
+  DatabaseZap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -103,6 +105,7 @@ export function ReadingResult({ reading }: ReadingResultProps) {
                 label={card.label}
                 seed={card.index + 1}
                 suit={card.suit}
+                image={card.image}
                 reversed={drawn.reversed}
                 className="text-[10px]"
               />
@@ -119,6 +122,87 @@ export function ReadingResult({ reading }: ReadingResultProps) {
           );
         })}
       </div>
+
+      {interp.research?.status === "unavailable" && (
+        <p className="rounded-xl border border-[rgba(215,180,106,0.2)] bg-[rgba(215,180,106,0.06)] px-4 py-3 text-center text-sm text-[#b9b4c8]">
+          {interp.research.summary}
+        </p>
+      )}
+      {(interp.research?.status === "completed" ||
+        interp.research?.status === "partial") && (
+        <Section icon={DatabaseZap} title="现实资料">
+          <div className="space-y-5 break-words">
+            <div>
+              <h3 className="font-medium text-[#f2da9c]">现实资料结论</h3>
+              <p className="mt-1">{interp.research.summary}</p>
+            </div>
+            {interp.research.asOfDate && (
+              <p className="text-sm text-[#b9b4c8]">
+                截至日期：{interp.research.asOfDate}
+              </p>
+            )}
+            {interp.research.facts.length > 0 && (
+              <div>
+                <h3 className="font-medium text-[#f2da9c]">已确认事实</h3>
+                <ul className="mt-2 space-y-2">
+                  {interp.research.facts.map((fact, i) => (
+                    <li key={i}>• {fact.claim}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {interp.research.decisionVariables.length > 0 && (
+              <div>
+                <h3 className="font-medium text-[#f2da9c]">决定性变量</h3>
+                <p className="mt-1">
+                  {interp.research.decisionVariables.join("、")}
+                </p>
+              </div>
+            )}
+            {interp.research.uncertainties.length > 0 && (
+              <div>
+                <h3 className="font-medium text-[#f2da9c]">不确定性与局限</h3>
+                <ul className="mt-2 space-y-2">
+                  {interp.research.uncertainties.map((item) => (
+                    <li key={item}>• {item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {interp.research.sources.length > 0 && (
+              <div>
+                <h3 className="font-medium text-[#f2da9c]">来源</h3>
+                <ul className="mt-2 space-y-3">
+                  {interp.research.sources.map((source) => (
+                    <li key={source.id}>
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex max-w-full items-center gap-1 text-[#d7b46a] hover:text-[#f2da9c]"
+                      >
+                        <span className="truncate">
+                          [{source.id}] {source.title}
+                        </span>
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                      </a>
+                      <p className="text-xs text-[#b9b4c8]">
+                        {source.publisher}
+                        {source.publishedAt ? ` · ${source.publishedAt}` : ""}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+      {interp.tarotPerspective && (
+        <Section icon={Sparkles} title="塔罗视角">
+          <p>{interp.tarotPerspective}</p>
+        </Section>
+      )}
 
       {/* 整体能量 */}
       <Section icon={Telescope} title="整体能量概览">

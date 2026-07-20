@@ -538,6 +538,7 @@ function buildDeck(): TarotCardData[] {
       uprightKeywords: major.upright,
       reversedKeywords: major.reversed,
       essence: major.essence,
+      image: `/tarot/rws/major-${i}.webp`,
     });
   });
 
@@ -557,6 +558,7 @@ function buildDeck(): TarotCardData[] {
           uprightKeywords: entry[0],
           reversedKeywords: entry[1],
           essence: entry[2],
+          image: `/tarot/rws/${suit}-${rank + 1}.webp`,
         });
       });
     },

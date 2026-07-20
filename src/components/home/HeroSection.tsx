@@ -6,6 +6,7 @@ import { ChevronDown, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TarotCardBack } from "@/components/tarot/TarotCardBack";
 import { TarotCardFace } from "@/components/tarot/TarotCardFace";
+import { getCardById } from "@/data/tarot-cards";
 import { MoonPhase } from "@/components/background/MoonPhase";
 
 const floatingCards = [
@@ -16,6 +17,7 @@ const floatingCards = [
 
 export function HeroSection() {
   const reduceMotion = useReducedMotion();
+  const star = getCardById("major-17");
 
   return (
     <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 pt-20 pb-16">
@@ -101,6 +103,7 @@ export function HeroSection() {
                 label="XVII"
                 seed={17}
                 suit="major"
+                image={star?.image}
                 className="text-[16px]"
               />
             )}
@@ -120,6 +123,7 @@ export function HeroSection() {
             label="XVII"
             seed={17}
             suit="major"
+            image={star?.image}
             className="text-[14px]"
           />
         </motion.div>

@@ -21,7 +21,7 @@ export interface TarotCardData {
   reversedKeywords: string[];
   /** 一句话牌意 */
   essence: string;
-  /** 真实插画路径,当前为空,占位插画由 seed 生成 */
+  /** 已核验的本地 RWS 公版插画路径 */
   image?: string;
 }
 

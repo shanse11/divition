@@ -102,6 +102,7 @@ export function DailyCardWidget() {
               label={card.label}
               seed={card.index + 1}
               suit={card.suit}
+              image={card.image}
               reversed={daily.reversed}
             />
           </div>

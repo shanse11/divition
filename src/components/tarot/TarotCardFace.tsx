@@ -1,3 +1,7 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export interface TarotCardFaceProps {
@@ -11,6 +15,8 @@ export interface TarotCardFaceProps {
   seed: number;
   /** 花色符号: wands/cups/swords/pentacles/major */
   suit: "wands" | "cups" | "swords" | "pentacles" | "major";
+  /** 已核验的本地牌面；加载失败时回退原创抽象牌面。 */
+  image?: string;
   /** 是否逆位展示(旋转180°) */
   reversed?: boolean;
   className?: string;
@@ -54,9 +60,11 @@ export function TarotCardFace({
   label,
   seed,
   suit,
+  image,
   reversed = false,
   className,
 }: TarotCardFaceProps) {
+  const [imageFailed, setImageFailed] = useState(false);
   const rand = mulberry(seed * 7919);
   const hue = SUIT_HUES[suit];
   const orbits = Array.from({ length: 3 }, (_, i) => ({
@@ -85,70 +93,83 @@ export function TarotCardFace({
           "0 1px 0 rgba(242,218,156,0.18) inset, 0 12px 32px -12px rgba(0,0,0,0.8)",
       }}
     >
-      <div className="absolute inset-[5%] rounded-lg border border-[rgba(215,180,106,0.3)]" />
-      {/* 顶部编号 */}
-      <div className="absolute inset-x-0 top-[6%] text-center">
-        <span className="font-display text-[0.55em] tracking-[0.25em] text-[#d7b46a]">
-          {label}
-        </span>
-      </div>
-      {/* 抽象星轨插画 */}
-      <svg
-        aria-hidden
-        viewBox="0 0 120 200"
-        className="absolute inset-0 h-full w-full"
-        fill="none"
-      >
-        {orbits.map((o, i) => (
-          <ellipse
-            key={i}
-            cx={o.cx}
-            cy={o.cy}
-            rx={o.r}
-            ry={o.r * 0.62}
-            stroke={hue}
-            strokeWidth="0.7"
-            strokeDasharray={`${o.dash} ${o.dash * 1.6}`}
-            opacity={0.55 - i * 0.12}
-            transform={`rotate(${i * 32 - 30} ${o.cx} ${o.cy})`}
-          />
-        ))}
-        {sparks.map((s, i) => (
-          <circle
-            key={i}
-            cx={s.x}
-            cy={s.y}
-            r={s.r}
-            fill="#f2da9c"
-            opacity="0.75"
-          />
-        ))}
-        <circle cx="60" cy="92" r="4" fill={hue} opacity="0.9" />
-        <circle
-          cx="60"
-          cy="92"
-          r="8.5"
-          stroke={hue}
-          strokeWidth="0.6"
-          opacity="0.5"
+      {image && !imageFailed ? (
+        <Image
+          src={image}
+          alt={`${name}（${nameEn}）${reversed ? "逆位" : "正位"}牌面`}
+          fill
+          sizes="(max-width: 640px) 40vw, 180px"
+          className="object-cover"
+          onError={() => setImageFailed(true)}
         />
-      </svg>
-      {/* 花色符号 */}
-      <div
-        className="absolute inset-x-0 top-[38%] text-center text-[1.6em]"
-        style={{ color: hue }}
-      >
-        {SUIT_GLYPHS[suit]}
-      </div>
-      {/* 牌名 */}
-      <div className="absolute inset-x-2 bottom-[7%] text-center">
-        <p className="font-serif-cn text-[0.72em] leading-tight font-bold text-[#f7f1e7]">
-          {name}
-        </p>
-        <p className="font-display mt-0.5 text-[0.42em] tracking-[0.14em] text-[#b9b4c8] uppercase">
-          {nameEn}
-        </p>
-      </div>
+      ) : (
+        <>
+          <div className="absolute inset-[5%] rounded-lg border border-[rgba(215,180,106,0.3)]" />
+          {/* 顶部编号 */}
+          <div className="absolute inset-x-0 top-[6%] text-center">
+            <span className="font-display text-[0.55em] tracking-[0.25em] text-[#d7b46a]">
+              {label}
+            </span>
+          </div>
+          {/* 抽象星轨插画 */}
+          <svg
+            aria-hidden
+            viewBox="0 0 120 200"
+            className="absolute inset-0 h-full w-full"
+            fill="none"
+          >
+            {orbits.map((o, i) => (
+              <ellipse
+                key={i}
+                cx={o.cx}
+                cy={o.cy}
+                rx={o.r}
+                ry={o.r * 0.62}
+                stroke={hue}
+                strokeWidth="0.7"
+                strokeDasharray={`${o.dash} ${o.dash * 1.6}`}
+                opacity={0.55 - i * 0.12}
+                transform={`rotate(${i * 32 - 30} ${o.cx} ${o.cy})`}
+              />
+            ))}
+            {sparks.map((s, i) => (
+              <circle
+                key={i}
+                cx={s.x}
+                cy={s.y}
+                r={s.r}
+                fill="#f2da9c"
+                opacity="0.75"
+              />
+            ))}
+            <circle cx="60" cy="92" r="4" fill={hue} opacity="0.9" />
+            <circle
+              cx="60"
+              cy="92"
+              r="8.5"
+              stroke={hue}
+              strokeWidth="0.6"
+              opacity="0.5"
+            />
+          </svg>
+          {/* 花色符号 */}
+          <div
+            className="absolute inset-x-0 top-[38%] text-center text-[1.6em]"
+            style={{ color: hue }}
+          >
+            {SUIT_GLYPHS[suit]}
+          </div>
+          {/* 牌名 */}
+          <div className="absolute inset-x-2 bottom-[7%] text-center">
+            <p className="font-serif-cn text-[0.72em] leading-tight font-bold text-[#f7f1e7]">
+              {name}
+            </p>
+            <p className="font-display mt-0.5 text-[0.42em] tracking-[0.14em] text-[#b9b4c8] uppercase">
+              {nameEn}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

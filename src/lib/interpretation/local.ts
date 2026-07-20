@@ -6,17 +6,22 @@ import {
   type ReadingCategory,
   type ReadingStyle,
 } from "@/types/tarot";
-import type { CardInterpretationItem, Interpretation } from "@/types/reading";
+import type {
+  CardInterpretationItem,
+  Interpretation,
+  ResearchContext,
+} from "@/types/reading";
 
 export const DISCLAIMER =
   "本解读由 AI 生成,仅供娱乐与自我反思,不构成医疗、法律、投资等专业建议。未来始终掌握在你自己手中。";
 
-interface LocalInterpretationInput {
+export interface LocalInterpretationInput {
   category: ReadingCategory;
   question: string;
   spreadId: string;
   style: ReadingStyle;
   cards: DrawnCard[];
+  research?: ResearchContext;
 }
 
 const STYLE_OPENERS: Record<ReadingStyle, string> = {
@@ -122,5 +127,12 @@ export function generateLocalInterpretation(
       ? `记住「${firstCard.name}」带来的讯息:${firstCard.essence}。`
       : "答案不在牌里,而在你看牌时心里浮现的那个念头。",
     disclaimer: DISCLAIMER,
+    ...(input.research
+      ? {
+          research: input.research,
+          tarotPerspective:
+            "牌面在这里仅提供象征性的观察：把关键词对应到你可验证的准备、选择和心理预期，而不是把它当作事实或结果预测。",
+        }
+      : {}),
   };
 }

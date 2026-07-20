@@ -226,6 +226,7 @@ export function SharePanel({
                         label={card.label}
                         seed={card.seed}
                         suit={card.suit}
+                        image={card.image}
                         reversed={card.reversed}
                         className="text-[8px]"
                       />

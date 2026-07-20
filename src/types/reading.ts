@@ -22,6 +22,35 @@ export interface Interpretation {
   summary: string;
   /** 免责声明 */
   disclaimer: string;
+  /** 仅在需要现实资料的问题中附带；历史记录可安全缺失。 */
+  research?: ResearchContext;
+  /** 将牌面与现实变量分开的象征性观察。 */
+  tarotPerspective?: string;
+}
+
+export type ResearchStatus =
+  "not_needed" | "unavailable" | "completed" | "partial";
+export type FactStatus = "past" | "current" | "future" | "mixed";
+
+export interface ResearchSource {
+  id: string;
+  title: string;
+  url: string;
+  publisher: string;
+  publishedAt: string | null;
+  tier: "official" | "primary" | "reputable" | "secondary";
+  summary: string;
+}
+
+export interface ResearchContext {
+  status: ResearchStatus;
+  asOfDate: string | null;
+  summary: string;
+  factStatus: FactStatus;
+  facts: Array<{ claim: string; sourceIds: string[] }>;
+  decisionVariables: string[];
+  uncertainties: string[];
+  sources: ResearchSource[];
 }
 
 export interface CardInterpretationItem {

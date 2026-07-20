@@ -26,6 +26,7 @@ export interface PosterCard {
   nameEn: string;
   label: string;
   suit: TarotSuit;
+  image?: string;
   seed: number;
   position: string;
   reversed: boolean;

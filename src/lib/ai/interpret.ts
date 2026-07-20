@@ -20,6 +20,7 @@ import {
 } from "@/lib/interpretation/local";
 import { generateLocalDreamReading } from "@/lib/interpretation/local-dream";
 import { logger } from "@/lib/logger";
+import { researchQuestion } from "@/lib/research/service";
 import type { Interpretation } from "@/types/reading";
 import type { DreamInput } from "@/lib/validation/dream";
 
@@ -53,10 +54,12 @@ export async function interpretTarot(
   input: TarotPromptInput,
 ): Promise<{ interpretation: Interpretation; source: "ai" | "local" }> {
   const provider = getAiProvider();
+  const research = await researchQuestion(input.question);
+  const enrichedInput = { ...input, research };
 
   if (provider.name === "mock") {
     return {
-      interpretation: generateLocalInterpretation(input),
+      interpretation: generateLocalInterpretation(enrichedInput),
       source: "local",
     };
   }
@@ -65,7 +68,7 @@ export async function interpretTarot(
     const raw = await provider.complete(
       [
         { role: "system", content: buildTarotSystemPrompt() },
-        { role: "user", content: buildTarotUserPrompt(input) },
+        { role: "user", content: buildTarotUserPrompt(enrichedInput) },
       ],
       { json: true },
     );
@@ -75,13 +78,13 @@ export async function interpretTarot(
         issues: parsed.error.issues.length,
       });
       return {
-        interpretation: generateLocalInterpretation(input),
+        interpretation: generateLocalInterpretation(enrichedInput),
         source: "local",
       };
     }
     // 免责声明始终使用站方文案,避免模型改写
     return {
-      interpretation: { ...parsed.data, disclaimer: DISCLAIMER },
+      interpretation: { ...parsed.data, research, disclaimer: DISCLAIMER },
       source: "ai",
     };
   } catch (error) {
@@ -89,7 +92,7 @@ export async function interpretTarot(
       message: error instanceof Error ? error.message : "unknown",
     });
     return {
-      interpretation: generateLocalInterpretation(input),
+      interpretation: generateLocalInterpretation(enrichedInput),
       source: "local",
     };
   }
