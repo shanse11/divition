@@ -21,10 +21,57 @@ import {
 import { generateLocalDreamReading } from "@/lib/interpretation/local-dream";
 import { logger } from "@/lib/logger";
 import { researchQuestion } from "@/lib/research/service";
-import type { Interpretation } from "@/types/reading";
+import type { Interpretation, ResearchContext } from "@/types/reading";
 import type { DreamInput } from "@/lib/validation/dream";
 
 let cachedProvider: AiProvider | null = null;
+
+function concise(value: string, max: number): string {
+  return value.replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+/**
+ * The model may improve wording, but it must never introduce sources or turn a
+ * raw search snippet into a fact. Runtime research remains the source of truth.
+ */
+export function mergeResearchContext(
+  runtime: ResearchContext,
+  model: ResearchContext | undefined,
+): ResearchContext {
+  if (
+    !model ||
+    runtime.status === "not_needed" ||
+    runtime.status === "unavailable"
+  )
+    return runtime;
+
+  const allowedIds = new Set(runtime.sources.map((source) => source.id));
+  const facts = model.facts
+    .map((fact) => ({
+      claim: concise(fact.claim, 500),
+      sourceIds: fact.sourceIds.filter((id) => allowedIds.has(id)).slice(0, 4),
+    }))
+    .filter((fact) => fact.claim && fact.sourceIds.length > 0)
+    .slice(0, 8);
+
+  return {
+    ...runtime,
+    summary:
+      concise(model.summary, 900) ||
+      "已找到可追溯来源，但尚未整理出足以确认的资料结论。",
+    facts,
+    decisionVariables: model.decisionVariables
+      .map((item) => concise(item, 300))
+      .filter(Boolean)
+      .slice(0, 8),
+    uncertainties: [...runtime.uncertainties, ...model.uncertainties]
+      .map((item) => concise(item, 500))
+      .filter(Boolean)
+      .filter((item, index, items) => items.indexOf(item) === index)
+      .slice(0, 8),
+    sources: runtime.sources,
+  };
+}
 
 export function getAiProvider(): AiProvider {
   if (cachedProvider) return cachedProvider;
@@ -84,7 +131,11 @@ export async function interpretTarot(
     }
     // 免责声明始终使用站方文案,避免模型改写
     return {
-      interpretation: { ...parsed.data, research, disclaimer: DISCLAIMER },
+      interpretation: {
+        ...parsed.data,
+        research: mergeResearchContext(research, parsed.data.research),
+        disclaimer: DISCLAIMER,
+      },
       source: "ai",
     };
   } catch (error) {
