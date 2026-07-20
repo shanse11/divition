@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { READING_STYLES, type ReadingStyle } from "@/types/tarot";
 import { cn } from "@/lib/utils";
+import { getSelectionCardClassName } from "@/components/tarot/steps/selection-card-style";
 
 interface StyleStepProps {
   value: ReadingStyle;
@@ -38,12 +40,17 @@ export function StyleStep({ value, onSelect, onNext, onBack }: StyleStepProps) {
             type="button"
             onClick={() => onSelect(key)}
             className={cn(
-              "glass-card glass-card-hover rounded-xl p-5 text-center",
-              value === key &&
-                "border-[#d7b46a] bg-[rgba(215,180,106,0.1)] shadow-[0_0_20px_rgba(215,180,106,0.2)]",
+              "glass-card glass-card-hover rounded-xl p-5 text-center transition-[border-color,background-color,box-shadow,transform] duration-200",
+              getSelectionCardClassName(value === key),
             )}
             aria-pressed={value === key}
           >
+            {value === key && (
+              <span className="absolute top-2.5 right-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f2da9c] text-[#1c1608] shadow-[0_0_14px_rgba(242,218,156,0.5)]">
+                <Check className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only">已选择</span>
+              </span>
+            )}
             <p className="font-serif-cn text-[15px] font-bold text-[#f7f1e7]">
               {style.name}
             </p>

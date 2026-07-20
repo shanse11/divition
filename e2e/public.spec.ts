@@ -107,12 +107,17 @@ test.describe("public pages", () => {
       .click();
     await page.getByLabel("占卜问题").fill("接下来一个月我最需要留意什么？");
     await page.getByRole("button", { name: "下一步" }).click();
-    await page.getByRole("button", { name: /单牌指引/ }).click();
+    const spread = page.getByRole("button", { name: /单牌指引/ });
+    await spread.click();
+    await expect(spread).toHaveAttribute("aria-pressed", "true");
+    await expect(spread).toHaveClass(/ring-2/);
     await page.getByRole("button", { name: "下一步" }).click();
-    await page
+    const style = page
       .getByRole("button", { name: /温柔|理性|诗意/ })
-      .first()
-      .click();
+      .first();
+    await style.click();
+    await expect(style).toHaveAttribute("aria-pressed", "true");
+    await expect(style).toHaveClass(/ring-2/);
     await page.getByRole("button", { name: "开始洗牌", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("深呼吸");
     await page.getByRole("button", { name: "开始洗牌", exact: true }).click();

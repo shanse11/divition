@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock3, Layers } from "lucide-react";
+import { Check, Clock3, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpreadPreview } from "@/components/tarot/SpreadPreview";
 import { spreads } from "@/data/spreads";
 import { cn } from "@/lib/utils";
+import { getSelectionCardClassName } from "@/components/tarot/steps/selection-card-style";
 
 interface SpreadStepProps {
   value: string | null;
@@ -41,12 +42,17 @@ export function SpreadStep({
             type="button"
             onClick={() => onSelect(spread.id)}
             className={cn(
-              "glass-card glass-card-hover flex flex-col rounded-2xl p-5 text-left",
-              value === spread.id &&
-                "border-[#d7b46a] bg-[rgba(215,180,106,0.08)] shadow-[0_0_24px_rgba(215,180,106,0.18)]",
+              "glass-card glass-card-hover flex flex-col rounded-2xl p-5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200",
+              getSelectionCardClassName(value === spread.id),
             )}
             aria-pressed={value === spread.id}
           >
+            {value === spread.id && (
+              <span className="absolute top-3 right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-[#f2da9c] text-[#1c1608] shadow-[0_0_14px_rgba(242,218,156,0.5)]">
+                <Check className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only">已选择</span>
+              </span>
+            )}
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h3 className="font-serif-cn text-base font-bold text-[#f7f1e7]">

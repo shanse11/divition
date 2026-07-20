@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,27 +8,36 @@ import { Input } from "@/components/ui/input";
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const pendingRef = useRef(false);
   const [error, setError] = useState("");
   const submit = async (formData: FormData) => {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setPending(true);
     setError("");
-    const response = await fetch(`/api/auth/${mode}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-        nickname: formData.get("nickname"),
-      }),
-    });
-    const payload = (await response.json()) as { error?: string };
-    setPending(false);
-    if (!response.ok) {
-      setError(payload.error ?? "操作失败");
-      return;
+    try {
+      const response = await fetch(`/api/auth/${mode}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.get("email"),
+          password: formData.get("password"),
+          nickname: formData.get("nickname"),
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(payload.error ?? "操作失败");
+        return;
+      }
+      router.push("/history");
+      router.refresh();
+    } catch {
+      setError("网络暂时不可用,请稍后重试");
+    } finally {
+      pendingRef.current = false;
+      setPending(false);
     }
-    router.push("/history");
-    router.refresh();
   };
   return (
     <form

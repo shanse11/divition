@@ -6,26 +6,35 @@ import { getAnonId } from "@/server/identity";
 import { readingsRepo } from "@/server/repo/readings";
 import { dreamsRepo } from "@/server/repo/dreams";
 import { checkRateLimit } from "@/server/rate-limit";
+import {
+  getClientIp,
+  getRegistrationRateLimitKeys,
+} from "@/server/request-client";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") ?? "local";
-  if (!checkRateLimit(`register:${ip}`, 5, 10 * 60_000).ok) {
-    return NextResponse.json(
-      { error: "操作太频繁,请稍后再试" },
-      { status: 429 },
-    );
-  }
-
+  const ip = getClientIp(request.headers);
   let body: unknown;
   try {
     body = await request.json();
   } catch {
+    if (!checkRateLimit(`register-invalid:${ip}`, 20, 10 * 60_000).ok) {
+      return NextResponse.json(
+        { error: "操作太频繁,请稍后再试" },
+        { status: 429 },
+      );
+    }
     return NextResponse.json({ error: "请求格式错误" }, { status: 400 });
   }
 
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
+    if (!checkRateLimit(`register-invalid:${ip}`, 20, 10 * 60_000).ok) {
+      return NextResponse.json(
+        { error: "操作太频繁,请稍后再试" },
+        { status: 429 },
+      );
+    }
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "参数校验失败" },
       { status: 400 },
@@ -33,6 +42,16 @@ export async function POST(request: NextRequest) {
   }
 
   const { email, password, nickname } = parsed.data;
+  const keys = getRegistrationRateLimitKeys(ip, email);
+  if (
+    !checkRateLimit(keys.address, 30, 10 * 60_000).ok ||
+    !checkRateLimit(keys.account, 5, 10 * 60_000).ok
+  ) {
+    return NextResponse.json(
+      { error: "操作太频繁,请稍后再试" },
+      { status: 429 },
+    );
+  }
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return NextResponse.json({ error: "该邮箱已注册" }, { status: 409 });
