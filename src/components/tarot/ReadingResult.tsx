@@ -151,11 +151,6 @@ export function ReadingResult({ reading }: ReadingResultProps) {
                 </ul>
               </div>
             )}
-            {interp.research.facts.length === 0 && (
-              <p className="text-sm text-[#b9b4c8]">
-                当前没有足以作为已确认事实展示的资料；请以来源中的原始公告为准。
-              </p>
-            )}
             {interp.research.decisionVariables.length > 0 && (
               <div>
                 <h3 className="font-medium text-[#f2da9c]">决定性变量</h3>

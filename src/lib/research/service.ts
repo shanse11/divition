@@ -52,111 +52,35 @@ function plan(question: string) {
     .replace(/[？?！!。]/g, " ")
     .trim()
     .slice(0, 160);
-  const valorant = /瓦罗兰特|valorant/i.test(subject);
-  return valorant
-    ? [
-        `site:valorantesports.com ${subject}`,
-        `site:playvalorant.com ${subject}`,
-        `${subject} official results schedule ranking`,
-      ]
-    : [
-        subject,
-        `${subject} official`,
-        `${subject} latest results schedule ranking`,
-      ];
+  return [
+    subject,
+    `${subject} official`,
+    `${subject} latest results schedule ranking`,
+  ];
 }
-
-const BLOCKED_HOSTS = [
-  "bilibili.com",
-  "douyin.com",
-  "reddit.com",
-  "weibo.com",
-  "zhihu.com",
-  "x.com",
-  "twitter.com",
-  "youtube.com",
-  "tiktok.com",
-  "facebook.com",
-  "instagram.com",
-  "discord.com",
-  "tieba.baidu.com",
-];
-
-const OFFICIAL_HOSTS = [
-  "valorantesports.com",
-  "playvalorant.com",
-  "riotgames.com",
-];
-
-const REPUTABLE_HOSTS = [
-  "apnews.com",
-  "reuters.com",
-  "bbc.com",
-  "espn.com",
-  "theverge.com",
-  "ft.com",
-  "wsj.com",
-  "nytimes.com",
-  "bloomberg.com",
-  "techcrunch.com",
-];
-
-function hostMatches(host: string, domains: string[]): boolean {
-  return domains.some(
-    (domain) => host === domain || host.endsWith(`.${domain}`),
-  );
+function sourceTier(source: ResearchSource): ResearchSource["tier"] {
+  const host = new URL(source.url).hostname.toLowerCase();
+  return /(^|\.)(gov|edu|org)$/.test(host) ||
+    /riotgames|valorantesports|official/.test(host)
+    ? "official"
+    : "reputable";
 }
-
-function cleanSummary(value: string): string {
-  return value
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
-    .replace(/\b\d{1,2}:\d{2}(?:\/\d{1,2}:\d{2})?\b/g, " ")
-    .replace(/\b[\d,]+\s+(?:upvotes?|comments?)\b/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 700);
-}
-
-function sourceTier(source: ResearchSource): ResearchSource["tier"] | null {
-  let host: string;
-  try {
-    host = new URL(source.url).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-  if (hostMatches(host, BLOCKED_HOSTS)) return null;
-  if (hostMatches(host, OFFICIAL_HOSTS) || host.endsWith(".gov"))
-    return "official";
-  if (host.endsWith(".edu")) return "primary";
-  if (hostMatches(host, REPUTABLE_HOSTS)) return "reputable";
-  return null;
-}
-
-/** Remove user-generated/aggregated results and retain only sources safe to cite. */
-export function curateResearchSources(
-  sources: ResearchSource[],
-  max: number,
-): ResearchSource[] {
+function dedupe(sources: ResearchSource[], max: number): ResearchSource[] {
   const seen = new Set<string>();
   return sources
-    .flatMap((source) => {
-      const tier = sourceTier(source);
-      const summary = cleanSummary(source.summary);
-      if (!tier || !summary) return [];
-      const url = new URL(source.url);
-      const key = url.hostname + url.pathname.replace(/\/$/, "");
-      if (seen.has(key)) return [];
+    .filter((source) => {
+      const key =
+        new URL(source.url).hostname +
+        new URL(source.url).pathname.replace(/\/$/, "");
+      if (seen.has(key) || !source.summary) return false;
       seen.add(key);
-      return [{ ...source, summary, tier }];
-    })
-    .sort((a, b) => {
-      const priority = { official: 0, primary: 1, reputable: 2, secondary: 3 };
-      return priority[a.tier] - priority[b.tier];
+      return true;
     })
     .slice(0, max)
     .map((source, index) => ({
       ...source,
       id: `S${index + 1}`,
+      tier: sourceTier(source),
     }));
 }
 export async function researchQuestion(
@@ -187,7 +111,7 @@ export async function researchQuestion(
         plan(normalized).map((query) => provider.search(query, 3)),
       )
     ).flat();
-    const sources = curateResearchSources(gathered, config.maxSources);
+    const sources = dedupe(gathered, config.maxSources);
     if (!sources.length)
       return {
         ...empty(
@@ -201,10 +125,11 @@ export async function researchQuestion(
     return {
       status: sources.length < 3 ? "partial" : "completed",
       asOfDate,
-      summary: `已检索到 ${sources.length} 个高可信来源；资料结论仅基于下方可追溯来源整理，最终以原始官方公告为准。`,
+      summary: `已检索到 ${sources.length} 个可访问来源；以下资料用于建立事实底座，最终结论仍须以原始官方公告为准。`,
       factStatus,
-      // 搜索摘要是候选材料，不是事实；由模型整理并绑定来源后才会展示。
-      facts: [],
+      facts: sources
+        .slice(0, 3)
+        .map((source) => ({ claim: source.summary, sourceIds: [source.id] })),
       decisionVariables: [
         "官方公告与赛程/状态更新",
         "近期可验证的表现与可用信息",

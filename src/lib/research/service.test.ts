@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  curateResearchSources,
-  needsResearch,
-  researchQuestion,
-} from "@/lib/research/service";
+import { needsResearch, researchQuestion } from "@/lib/research/service";
 
 describe("research intent and mock fallback", () => {
   it("detects time-sensitive factual questions", () => {
@@ -22,46 +18,5 @@ describe("research intent and mock fallback", () => {
     );
     expect(result.status).toBe("unavailable");
     expect(result.sources).toEqual([]);
-  });
-
-  it("filters user-generated sources and prioritizes official sources", () => {
-    const sources = curateResearchSources(
-      [
-        {
-          id: "",
-          title: "Community post",
-          url: "https://www.reddit.com/r/example/comments/1",
-          publisher: "reddit.com",
-          publishedAt: null,
-          tier: "secondary",
-          summary: "445 upvotes, 93 comments None",
-        },
-        {
-          id: "",
-          title: "News coverage",
-          url: "https://www.espn.com/esports/story",
-          publisher: "espn.com",
-          publishedAt: null,
-          tier: "secondary",
-          summary: "A clean report about the event.",
-        },
-        {
-          id: "",
-          title: "Official standings",
-          url: "https://valorantesports.com/standings",
-          publisher: "valorantesports.com",
-          publishedAt: null,
-          tier: "secondary",
-          summary: "Official standings and schedule.",
-        },
-      ],
-      6,
-    );
-
-    expect(sources.map((source) => source.url)).toEqual([
-      "https://valorantesports.com/standings",
-      "https://www.espn.com/esports/story",
-    ]);
-    expect(sources[0]).toMatchObject({ id: "S1", tier: "official" });
   });
 });
